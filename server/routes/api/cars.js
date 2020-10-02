@@ -79,22 +79,22 @@ router.put("/", async (req, res) => {
   ) {
     res.status(400).send("Fill Out the form correctly");
   }
-  const carsCollection = await loadCarCollection();
+  const carUpdate = {
+    manufacturer: req.body.manufacturer,
+    model: req.body.model,
+    year: req.body.year,
+    country: req.body.country,
+  };
   console.log(req.body);
-  let car = await carsCollection.updateOne(
-    {
-      _id: req.body.id,
-    },
-    {
-      $set: {
-        manufacturer: req.body.manufacturer,
-        model: req.body.model,
-        year: req.body.year,
-        country: req.body.country,
-      },
-    }
+  const carId = req.body._id;
+  console.log(carId);
+  const cars = await loadCarCollection();
+  let updatedCar = await cars.updateOne(
+    { _id: new mongodb.ObjectID(carId) },
+    { $set: carUpdate }
   );
-  return res.status(201).json(car);
+  console.log(updatedCar);
+  return res.status(201).json(updatedCar);
 });
 
 // Delete Cars
@@ -108,7 +108,7 @@ router.delete("/:id", async (req, res) => {
 async function loadCarCollection() {
   try {
     const client = await mongodb.MongoClient.connect(
-      "mongodb+srv://plutoNet:plutoNet@cluster0.mz0v6.mongodb.net/carStore",
+      "mongodb+srv://plutoNet:plutoNet@cluster0.mz0v6.mongodb.net",
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
